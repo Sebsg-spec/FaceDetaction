@@ -1,11 +1,15 @@
 import React, {Component} from 'react';
+import ParticlesBg from 'particles-bg'
+import './App.css';
+
 import Navigation from './Components/Navigation/Navigation';
 import Logo from './Components/Logo/Logo';
 import ImageLinkForm from './Components/ImageLinkForm/ImageLinkForm';
 import Rank from './Components/Rank/Rank';
 import FaceRecognition from './Components/FaceRecognition/FaceRecognition';
-import ParticlesBg from 'particles-bg'
-import './App.css';
+import SignIn from './Components/SignIn/SignIn';
+
+
 
 
 
@@ -16,15 +20,37 @@ class App extends Component {
       super();
       this.state = {
         input: '',
-        imageURL: ''
+        imageURL: '',
+        box: {},
+        route: 'SignIn'
       } 
     }
+
+    onRouteChange = () => {
+      this.state.route
+    }
+
+    calculateFaceLocation = (data) =>{
+      const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+      const image = document.getElementById('inputImage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+      return{
+        leftcol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_Row * height,
+        rightCol: width - (clarifaiFace.right_Col * width),
+        bottomRow: height - (clarifaiFace.bottom_Row * height)
+      }
+
+    }
+    displayFaceBox = (box) =>{
+      this.setState({box: box});
+    }
+
    clarifaiSetup = (imgURL) =>{
-const PAT = '7812b426133243fc976dc1bbbb4be9d6';
+const PAT = 'b6125b8351cb49e99233233dbe732e69';
 const USER_ID = 'sebsg';       
-const APP_ID = 'Smart_Brain';
-// const MODEL_ID = 'face-detection';
-// const MODEL_VERSION_ID = '6dc7e46bc9124c5c8824be4822abe105';    
+const APP_ID = 'Smart_Brain'; 
 const IMAGE_URL = imgURL;
 
 const raw = JSON.stringify({
@@ -60,9 +86,8 @@ return requestOptions;
         this.setState({input: event.target.value});
     }
     onSubmit = () =>{ 
-      fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.clarifaiSetup)
-      .then(response => response.text())
-      .then(result => console.log(result))
+      fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.clarifaiSetup(this.state.input))
+      .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
       .catch(error => console.log('error', error));
     }
 
@@ -72,13 +97,17 @@ return requestOptions;
        <ParticlesBg type= "cobweb" color={["#FFFFFF"]}  bg={true} />
           
     <Navigation />
+      {this.state.route === 'SignIn'
+    ?<SignIn onRouteChange = {this.onRouteChange} />
+    : <div>
     <Logo />
     <Rank />
     <ImageLinkForm
      onInputChange = {this.onInputChange} 
      onSubmit = {this.onSubmit}
       />
-    <FaceRecognition imageURL={this.state.input} /> 
+    <FaceRecognition box={this.state.box} imageURL={this.state.input} /> 
+    </div>}
     </div>
     );
   }
