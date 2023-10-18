@@ -22,9 +22,23 @@ class App extends Component {
         input: '',
         imageURL: '',
         box: {},
-        route: 'SignIn',
+        route: 'home',
         isSignedIn: false
       } 
+    }
+    calculateFaceLocation = (data) =>{
+      const clarifaiFace = data.outputs[0].data.regions.regions[0].region_info.bounding_box;   ;
+      const image = document.getElementById('inputimage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+      console.log(width, height);
+      return{
+        leftcol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_Row * height,
+        rightCol: width - (clarifaiFace.right_Col * width),
+        bottomRow: height - (clarifaiFace.bottom_Row * height)
+      }
+
     }
 
     onRouteChange = (route) => {
@@ -37,28 +51,16 @@ class App extends Component {
 
     }
 
-    calculateFaceLocation = (data) =>{
-      const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-      const image = document.getElementById('inputImage');
-      const width = Number(image.width);
-      const height = Number(image.height);
-      return{
-        leftcol: clarifaiFace.left_col * width,
-        topRow: clarifaiFace.top_Row * height,
-        rightCol: width - (clarifaiFace.right_Col * width),
-        bottomRow: height - (clarifaiFace.bottom_Row * height)
-      }
 
-    }
     displayFaceBox = (box) =>{
       this.setState({box: box});
     }
 
-   clarifaiSetup = (imgURL) =>{
-const PAT = 'b6125b8351cb49e99233233dbe732e69';
-const USER_ID = 'sebsg';       
-const APP_ID = 'Smart_Brain'; 
-const IMAGE_URL = imgURL;
+   clarifaiSetup = (imageURL) =>{
+const PAT = '22dc1e29be01437cadc5ddeb3853c30b';
+const USER_ID = 'sebi';       
+const APP_ID = 'Test'; 
+const IMAGE_URL = imageURL;
 
 const raw = JSON.stringify({
     "user_app_id": {
@@ -92,7 +94,8 @@ return requestOptions;
     onInputChange = (event) =>{
         this.setState({input: event.target.value});
     }
-    onSubmit = () =>{ 
+    onSubmit = () =>{  
+      this.setState({imageURL: this.state.input});
       fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.clarifaiSetup(this.state.input))
       .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
       .catch(error => console.log('error', error));
