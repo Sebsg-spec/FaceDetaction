@@ -22,24 +22,29 @@ class App extends Component {
         input: '',
         imageURL: '',
         box: {},
-        route: 'home',
+        route: 'signin',
         isSignedIn: false
       } 
     }
-    calculateFaceLocation = (data) =>{
-      const clarifaiFace = data.outputs[0].data.regions.regions[0].region_info.bounding_box;   ;
-      const image = document.getElementById('inputimage');
-      const width = Number(image.width);
-      const height = Number(image.height);
-      console.log(width, height);
-      return{
-        leftcol: clarifaiFace.left_col * width,
-        topRow: clarifaiFace.top_Row * height,
-        rightCol: width - (clarifaiFace.right_Col * width),
-        bottomRow: height - (clarifaiFace.bottom_Row * height)
-      }
+
+    calculateFaceLocation= (response) => {
+      console.log('At least here')
+      console.log(response)
+      const clarifaiFace = response.outputs[0]
+      .data.regions[0].region_info.bounding_box;
+          const image = document.getElementById('inputimage');
+          const width = Number(image.width);
+          const height = Number(image.height);
+          console.log(width , height)
+          return {
+            leftCol: clarifaiFace.left_col * width,
+            topRow: clarifaiFace.top_row * height,
+            rightCol: width - (clarifaiFace.right_col * width),
+            bottomRow: height - (clarifaiFace.bottom_row * height)
+          };
 
     }
+  
 
     onRouteChange = (route) => {
       if(route === 'signout'){
@@ -53,10 +58,11 @@ class App extends Component {
 
 
     displayFaceBox = (box) =>{
+      console.log("this is")
       this.setState({box: box});
     }
 
-   clarifaiSetup = (imageURL) =>{
+   returnclarifaiSetup = (imageURL) =>{
 const PAT = '22dc1e29be01437cadc5ddeb3853c30b';
 const USER_ID = 'sebi';       
 const APP_ID = 'Test'; 
@@ -78,7 +84,7 @@ const raw = JSON.stringify({
     ]
 });
 
-const requestOptions = {
+ const requestOptions = {
     method: 'POST',
     headers: {
         'Accept': 'application/json',
@@ -86,7 +92,6 @@ const requestOptions = {
     },
     body: raw
 };
-
 return requestOptions;
 
     }
@@ -95,10 +100,15 @@ return requestOptions;
         this.setState({input: event.target.value});
     }
     onSubmit = () =>{  
+      console.log('f u')
       this.setState({imageURL: this.state.input});
-      fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.clarifaiSetup(this.state.input))
-      .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
+      console.log("something");
+      fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.returnclarifaiSetup(this.state.input))
+      .then(response => response.json())
+      .then(response =>this.displayFaceBox(this.calculateFaceLocation(response)))
+
       .catch(error => console.log('error', error));
+       console.log('i get it')
     }
 
   render() {
