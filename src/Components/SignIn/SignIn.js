@@ -27,9 +27,11 @@ class SignIn extends React.Component{
         })
       })
       .then(response => response.json())
-      .then(data => {
-        if(data === 'success'){
+      .then(user => {
+        if(user.id){
           this.props.onRouteChange('home');
+          this.props.loadUser(user);
+
         }
       })
 
@@ -39,7 +41,7 @@ class SignIn extends React.Component{
     const { onRouteChange} = this.props;
       return(
         <article className="br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l shadow-5 mw5 center">
-        <main class="pa4 black-80">
+        <main className="pa4 black-80">
           <form className="measure center">
             <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
               <legend className="f2 fw6 ph0 mh0">Sign In</legend>
