@@ -27,15 +27,13 @@ class App extends Component {
       } 
     }
 
+
+
     calculateFaceLocation= (response) => {
-      console.log('At least here')
-      console.log(response)
-      const clarifaiFace = response.outputs[0]
-      .data.regions[0].region_info.bounding_box;
+      const clarifaiFace = response.outputs[0].data.regions[0].region_info.bounding_box;
           const image = document.getElementById('inputimage');
           const width = Number(image.width);
           const height = Number(image.height);
-          console.log(width , height)
           return {
             leftCol: clarifaiFace.left_col * width,
             topRow: clarifaiFace.top_row * height,
@@ -58,7 +56,6 @@ class App extends Component {
 
 
     displayFaceBox = (box) =>{
-      console.log("this is")
       this.setState({box: box});
     }
 
@@ -100,15 +97,11 @@ return requestOptions;
         this.setState({input: event.target.value});
     }
     onSubmit = () =>{  
-      console.log('f u')
       this.setState({imageURL: this.state.input});
-      console.log("something");
       fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.returnclarifaiSetup(this.state.input))
       .then(response => response.json())
       .then(response =>this.displayFaceBox(this.calculateFaceLocation(response)))
-
       .catch(error => console.log('error', error));
-       console.log('i get it')
     }
 
   render() {
@@ -130,7 +123,7 @@ return requestOptions;
           </div>
          
     : (
-      route === 'SignIn'
+      route === 'signin'
       ?<SignIn onRouteChange={this.onRouteChange}/>
       :<Register onRouteChange={this.onRouteChange}/>
     )}
