@@ -116,7 +116,17 @@ return requestOptions;
       this.setState({imageURL: this.state.input});
       fetch("https://api.clarifai.com/v2/models/face-detection/outputs", this.returnclarifaiSetup(this.state.input))
       .then(response => response.json())
-      .then(response =>this.displayFaceBox(this.calculateFaceLocation(response)))
+      .then(response =>{
+        if(response){
+          fetch('http://localhost:3000/image', {
+              method: 'put',
+              headers: {'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id: this.state.user.id
+          })
+        })
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response))})
       .catch(error => console.log('error', error));
     }
 
@@ -131,8 +141,8 @@ return requestOptions;
       ?<div>  
           <Logo />
           <Rank
-          username = {this.user.name}
-          userEntries = {this.user.entries}
+          name = {this.state.user.name}
+          entries = {this.state.user.entries}
           />
           <ImageLinkForm
             onInputChange = {this.onInputChange} 
