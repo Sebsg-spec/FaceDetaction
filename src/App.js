@@ -12,26 +12,28 @@ import Register from './Components/Register/Register';
 
 
 
+const initialState ={
 
+    input: '',
+    imageURL: '',
+    box: {},
+    route: 'signin',
+    isSignedIn: false,
+    user: {
+      id: '',
+      email: '',
+      name: '',
+      entries:0 ,
+      joined: ''
+    
+  } 
+}
 
 
 class App extends Component {
     constructor(){
       super();
-      this.state = {
-        input: '',
-        imageURL: '',
-        box: {},
-        route: 'signin',
-        isSignedIn: false,
-        user: {
-          id: '',
-          email: '',
-          name: '',
-          entries:0 ,
-          joined: ''
-        }
-      } 
+      this.state = initialState; 
     }
 
     loadUser = (data)=>{
@@ -62,7 +64,7 @@ class App extends Component {
 
     onRouteChange = (route) => {
       if(route === 'signout'){
-      this.setState({isSignedIn: false})
+      this.setState(initialState)
       }else if(route === 'home'){
         this.setState({isSignedIn: true})
       }
@@ -141,7 +143,7 @@ return requestOptions;
        <ParticlesBg type= "cobweb" color={["#FFFFFF"]}  bg={true} />
           
     <Navigation isSignedIn={isSignedIn} onRouteChange = {this.onRouteChange}/>
-    {this.state.route === 'home'
+    {route === 'home'
       ?<div>  
           <Logo />
           <Rank
